@@ -10,6 +10,13 @@ Vagrant.configure("2") do |config|
 		acs.vm.box = "ubuntu/xenial32"
 		acs.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
 		acs.vm.network "public_network"
+		acs.vm.provider "virtualbox" do |vb|
+			vb.name = "acs"
+			#vb.group = "TEST"
+			#vb.gui = true
+			#vb.memory = "1024"
+		end
+		
 		acs.vm.provision "shell", inline: <<-SHELL
 			echo "Getting .db from zabbix repo -----------------------------------------------------------------------------"
 			sudo wget wget http://repo.zabbix.com/zabbix/3.2/ubuntu/pool/main/z/zabbix-release/zabbix-release_3.2-1+xenial_all.deb
@@ -50,5 +57,48 @@ Vagrant.configure("2") do |config|
 			sudo apt-get update
 			sudo apt-get -y install ansible
 		SHELL
+	end
+	
+	config.vm.define "db" do |db|
+		db.vm.box = "C:/Vagrant_boxes/Windows_Server_2012_R2.box"
+		db.vm.network "private_network", ip: "192.168.10.110"
+		db.vm.guest = :windows
+		db.vm.communicator = "winrm"
+		db.vm.boot_timeout = 600
+		db.vm.graceful_halt_timeout = 600
+		db.vm.network :forwarded_port, guest: 3389, host: 3390
+		db.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true
+		db.winrm.username = "Administrator"
+		db.winrm.password = "Asap1234"
+		db.vm.provider "virtualbox" do |vb|
+		#   # Display the VirtualBox GUI when booting the machine
+			vb.name = "db"
+			#vb.group = "TEST"
+			vb.gui = true
+			vb.memory = "1024"
+		end
+	end
+
+	config.vm.define "app" do |app|
+		app.vm.box = "C:/Vagrant_boxes/Windows_Server_2012_R2.box"
+		app.vm.network "private_network", ip: "192.168.10.120"
+		app.vm.guest = :windows
+		app.vm.communicator = "winrm"
+		app.vm.boot_timeout = 600
+		app.vm.graceful_halt_timeout = 600
+		app.vm.network :forwarded_port, guest: 3389, host: 3391
+		app.vm.network :forwarded_port, guest: 5985, host: 5986, id: "winrm", auto_correct: true
+		app.winrm.username = "Administrator"
+		app.winrm.password = "Asap1234"
+		#app.vm.network :forwarded_port, guest: 3389, host: 3389
+		#app.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true
+		#app.vm.gui = true
+		app.vm.provider "virtualbox" do |vb|
+			#   # Display the VirtualBox GUI when booting the machine
+			vb.name = "app"
+			#vb.group = "TEST"
+			vb.gui = true
+			vb.memory = "1024"
+		end
 	end
 end
