@@ -1,0 +1,33 @@
+#
+[zabbix]
+127.0.0.1 ansible_ssh_host=127.0.0.1 ansible_ssh_user=vagrant ansible_ssh_pass=vagrant
+
+[touch]
+10.3.16.214 ansible_ssh_user=Administrator ansible_ssh_pass=Asap1234 ansible_ssh_port=5986 ansible_connection=winrm
+
+#[touch:vars]
+#ansible_ssh_user: Administrator
+#ansible_ssh_pass: Asap1234
+#ansible_ssh_port: 5986
+#ansible_connection: winrm
+# The following is necessary for Python 2.7.9+ (or any older Python that has backported SSLContext, eg, Python 2.7.5 on RHEL7) when using default WinRM self-signed certificates:
+#ansible_winrm_server_cert_validation: ignore
+
+[Exacta-db]
+192.168.10.110
+ansible_ssh_user: Administrator
+ansible_ssh_pass: Asap1234
+ansible_ssh_port: 5986
+ansible_connection: winrm
+
+[Exacta-app]
+192.168.10.120
+ansible_ssh_user: Administrator
+ansible_ssh_pass: Asap1234
+ansible_ssh_port: 5986
+ansible_connection: winrm
+
+[windows:children]
+touch
+Exacta-db
+Exacta-app
