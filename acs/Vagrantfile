@@ -1,0 +1,49 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure("2") do |config|
+	config.vm.define "acs" do |acs|
+		acs.vm.box = "ubuntu/xenial32"
+		acs.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
+		acs.vm.network "public_network"
+		acs.vm.provision "shell", inline: <<-SHELL
+			echo "Getting .db from zabbix repo -----------------------------------------------------------------------------"
+			sudo wget wget http://repo.zabbix.com/zabbix/3.2/ubuntu/pool/main/z/zabbix-release/zabbix-release_3.2-1+xenial_all.deb
+			sudo dpkg -i zabbix-release_3.2-1+xenial_all.deb
+			echo "Installing Apached, MYSQL, PHP ---------------------------------------------------------------------------"
+			sudo apt-get update
+			sudo apt-get install -y apache2 tasksel
+			sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password root'
+			sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password root'
+			#sudo apt-get -y install mysql-server
+			sudo tasksel install lamp-server
+			echo "Installing Zabbix and its dependencies -------------------------------------------------------------------"
+			sudo apt-get -y install zabbix-server-mysql zabbix-frontend-php
+			sudo apt-get -y install php-bcmath php-mbstring php-xmlwriter php-xmlreader
+	
+			#shell> mysql -uroot -p
+			echo "Creating zabbix db"
+			mysql -uroot -proot -e "CREATE DATABASE IF NOT EXISTS zabbix character set utf8 collate utf8_bin;"
+			echo "grant permissions to db"
+			mysql -uroot -proot -e "grant all privileges on zabbix.* to zabbix@localhost identified by 'zabbix';"
+			zcat /usr/share/doc/zabbix-server-mysql/create.sql.gz | mysql -uzabbix -pzabbix zabbix
+			#password = zabbix
+			sudo cp /vagrant/zabbix_server.conf /etc/zabbix/zabbix_server.conf
+			sudo cp /vagrant/apache.conf /etc/zabbix/apache.conf
+			sudo service zabbix-server start
+			sudo update-rc.d zabbix-server enable
+
+			sudo service apache2 restart
+			sudo cp /vagrant/zabbix.conf.php /usr/share/zabbix/conf/zabbix.conf.php
+	
+			curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+			curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
+			sudo apt-get update
+			sudo apt-get install mssql-tools unixodbc-dev
+		SHELL
+	end
+end
