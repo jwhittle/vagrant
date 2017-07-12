@@ -44,6 +44,11 @@ Vagrant.configure("2") do |config|
 			curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
 			sudo apt-get update
 			sudo apt-get install mssql-tools unixodbc-dev
+			
+			sudo apt-get -y install software-properties-common
+			sudo apt-add-repository ppa:ansible/ansible
+			sudo apt-get update
+			sudo apt-get -y install ansible
 		SHELL
 	end
 end
