@@ -14,11 +14,7 @@
 #ansible_winrm_server_cert_validation: ignore
 
 [Exacta-db]
-192.168.10.110
-ansible_ssh_user: Administrator
-ansible_ssh_pass: Asap1234
-ansible_ssh_port: 5986
-ansible_connection: winrm
+192.168.10.110 ansible_ssh_user: Administrator ansible_ssh_pass: Asap1234 ansible_ssh_port: 5986 ansible_connection: winrm
 
 [Exacta-app]
 192.168.10.120
