@@ -22,3 +22,4 @@ acs/.vagrant/machines/db/virtualbox/index_uuid
 acs/.vagrant/machines/db/virtualbox/synced_folders
 *.log
 *.log
+acs/.vagrant/machines/app/virtualbox/action_set_name
