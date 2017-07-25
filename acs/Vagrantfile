@@ -20,7 +20,7 @@ Vagrant.configure("2") do |config|
 		
 		acs.vm.provision "shell", inline: <<-SHELL
 			echo "Getting .db from zabbix repo -----------------------------------------------------------------------------"
-			sudo wget wget http://repo.zabbix.com/zabbix/3.2/ubuntu/pool/main/z/zabbix-release/zabbix-release_3.2-1+xenial_all.deb
+			sudo wget http://repo.zabbix.com/zabbix/3.2/ubuntu/pool/main/z/zabbix-release/zabbix-release_3.2-1+xenial_all.deb
 			sudo dpkg -i zabbix-release_3.2-1+xenial_all.deb
 			echo "Installing Apached, MYSQL, PHP ---------------------------------------------------------------------------"
 			sudo apt-get update
